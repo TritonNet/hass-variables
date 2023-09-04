@@ -104,8 +104,7 @@ async def async_setup(hass, config):
             Variable(variable_id, name, value, attributes, restore)
         )
 
-    @asyncio.coroutine
-    def async_set_variable_service(call):
+    async def async_set_variable_service(call):
         """Handle calls to the set_variable service."""
         entity_id = ENTITY_ID_FORMAT.format(call.data.get(ATTR_VARIABLE))
         entity = component.get_entity(entity_id)
@@ -123,7 +122,7 @@ async def async_setup(hass, config):
                 for variable in target_variables
             ]
             if tasks:
-                yield from asyncio.wait(tasks, loop=hass.loop)
+                await asyncio.wait(tasks, loop=hass.loop)
 
         else:
             _LOGGER.warning("Failed to set unknown variable: %s", entity_id)
@@ -189,8 +188,8 @@ class Variable(RestoreEntity):
         """Return the state attributes."""
         return self._attributes
 
-    @asyncio.coroutine
-    def async_set_variable(
+    
+    async def async_set_variable(
         self,
         value,
         value_template,
@@ -256,4 +255,4 @@ class Variable(RestoreEntity):
         if updated_value is not None:
             self._value = updated_value
 
-        yield from self.async_update_ha_state()
+        await self.async_update_ha_state()
